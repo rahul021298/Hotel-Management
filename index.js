@@ -17,11 +17,11 @@ app.use("/users", userRoutes);
 app.use('/staff', staffRoutes);
 app.use('/room', roomRoutes);
 app.use('/booked', bookedRoutes);
-// app.use(bśookingFilter);
+app.use(bookingFilter);
 
 app.listen(3000, function(){
     console.log("listening to 3000");
 });
-setInterval(function(){
-    bookingFilter.updateAllRooms();
-}, 10000);
+// setInterval(function(){
+//     bookingFilter.updateAllRooms();
+// }, 10000);

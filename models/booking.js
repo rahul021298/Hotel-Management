@@ -7,11 +7,11 @@ const BookingSchema = new Schema({
         ref: 'user',
         required: true
     },
-    room:{
+    room:[{
         type: mongoose.Schema.ObjectId,
         ref: 'room',
         required: true
-    },
+    }],
     checkIn:{
         type:Date,
         required:true
@@ -21,8 +21,26 @@ const BookingSchema = new Schema({
         required:true
     },
     roomType:{
-        type:String,
-        required:true
+        noOfDeluxe:{
+            type:Number,
+            required:true,
+            default: 0
+        },
+        noOfDeluxeNights:{
+            type:Number,
+            required:true,
+            default: 1
+        },
+        noOfStandard:{
+            type:Number,
+            required:true,
+            default: 0
+        },
+        noOfStandardNights:{
+            type:Number,
+            required:true,
+            default: 1
+        }
     },  
     guests:{
         noOfChild:{
@@ -42,10 +60,16 @@ const BookingSchema = new Schema({
         type:Number,
         required:true
     },
-    // bookingDates:[{
-    //     checkIn:{type: Date, required:true},
-    //     checkOut:{type: Date, required:true}
-    // }],
+    totalPrice:{
+        deluxePrice:{
+            type:Number,
+            default:0
+        },
+        standardPrice:{
+            type:Number,
+            default:true
+        }
+    },
     isVisible:{
         type:Boolean,
         default:true
