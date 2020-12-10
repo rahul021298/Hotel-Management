@@ -3,10 +3,26 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     // _id?: Object,
+    userName:{
+        type:String,
+        required:true
+    },
+    password:{
+        type:String,
+        required:true
+    },
+    confirmPassword:{
+        type:String,
+        required:true
+    },
     name:{
         firstName:{
            type:String,
            required:true
+       },
+       middleName:{
+            type:String,
+            required:true 
        },
        lastName:{
         type:String,
@@ -18,12 +34,8 @@ const UserSchema = new Schema({
             type:String,
             required:true
         },
-        houseNo:{
+        pincode:{
             type:Number,
-            required:true
-        },
-        landmark:{
-            type:String,
             required:true
         },
         city:{
@@ -39,7 +51,7 @@ const UserSchema = new Schema({
             required:true
         }
     },
-    phone:{
+    phoneNumber:{
         type:Number,
         required:true
     },

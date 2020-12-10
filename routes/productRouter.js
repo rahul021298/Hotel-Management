@@ -10,7 +10,7 @@ router.post('/saveDetails', async function(req, res){
     await productController.insertProducts(req.body);
     res.json({
         message:"success",
-        user: req.body
+        product: req.body
     });
 });
 

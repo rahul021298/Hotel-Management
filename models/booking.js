@@ -53,13 +53,13 @@ const BookingSchema = new Schema({
         }
     },
     noOfRooms:{
-        type:Number,
-        required:true
+        type:Number
+        // required:true
     },
     noOfNights:{
-        type:Number,
-        required:true
-    },
+        type:Number
+        // required:true
+    },//Remove this
     totalPrice:{
         deluxePrice:{
             type:Number,

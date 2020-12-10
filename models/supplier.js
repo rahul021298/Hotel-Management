@@ -2,25 +2,27 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const SupplierSchema = new Schema({
-    supplierName:{
+    name:{
+    firstName:{
         type:String,
         required:true
     },
+    lastName:{
+        type:String,
+        required:true
+    }
+},
     address:{
         name:{
             type:String,
             required:true
         },
-        houseNo:{
-            type:Number,
-            required:true
-        },
-        landmark:{
-            type:String,
-            required:true
-        },
         city:{
             type:String,
+            required:true
+        },
+        pincode:{
+            type:Number,
             required:true
         },
         state:{
@@ -32,7 +34,7 @@ const SupplierSchema = new Schema({
             required:true
         }
     },
-    phone:{
+    phoneNumber:{
         type:Number,
         required:true
     },

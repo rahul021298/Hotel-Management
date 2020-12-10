@@ -3,14 +3,14 @@ const router = express.Router();
 const supplierController = require("../controllers/supplierController");
 
 router.get('/', async function(req, res){
-    res.json(await supplierController.getUsers());
+    res.json(await supplierController.getSuppliers());
 });
 
 router.post('/saveDetails', async function(req, res){
     await supplierController.insertSuppliers(req.body);
     res.json({
         message:"success",
-        user: req.body
+        supplier: req.body
     });
 });
 

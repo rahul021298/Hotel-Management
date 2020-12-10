@@ -14,7 +14,7 @@ router.post('/saveDetails', async function(req, res){
     await bookedController.insertBookedRooms(req.body);
     res.json({
         message:"success",
-        user: req.body
+        room: req.body
     });
 });
 

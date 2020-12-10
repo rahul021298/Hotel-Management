@@ -5,17 +5,21 @@ const ProductSchema = new Schema({
     supplier:{
         type: mongoose.Schema.ObjectId,
         ref: 'supplier',
-        required: true
+        // required: true
     },
-    productName:{
+    name:{
         type:String,
         required:true
     },
-    productType:{
+    type:{
         type:String,
         required:true
     },
-    productQuantity:{
+    quantity:{
+        type:Number,
+        required:true
+    },
+    price:{
         type:Number,
         required:true
     },
