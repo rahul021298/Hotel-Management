@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const userController = require("./../controllers/userController");
+const authController = require("./../controllers/authController");
+
+router.post('/signup', authController.signup);
+router.post('/login', authController.login);
 
 router.get('/', async function(req, res){
     res.json(await userController.getUsers());
@@ -21,5 +25,4 @@ router.put('/:id', async function(req, res){
 router.delete('/:id', async function(req, res){
     res.json(await userController.deleteUsers(req.params.id))
 });
-
 module.exports = router;

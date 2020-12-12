@@ -9,10 +9,6 @@ router.post('/makingBookingFilter', async function(req, res, next){
     req.body.roomType={"noOfDeluxe":0, "noOfStandard":0};
     req.body.guests={"noOfAdults":0, "noOfChild":0}
     req.body.user="5fc5fe30a173fd1350bb7dc2";
-    // if(req.body.roomType==null){
-    //     req.body.roomType=req.body.noOfDeluxe;
-    //     req.body.roomType=req.body.noOfStandard;
-    // }
     var roomRequest = req.body;
     var guestsCheck=false; 
     var myRoom; var myRooms=[]; var availableRoomsByType=[];console.log(req.body);
@@ -98,6 +94,7 @@ router.post('/makingBookingFilter', async function(req, res, next){
                 roomRequest.checkIn=getMyDateFormat(roomRequest.checkIn);
                 roomRequest.checkOut=getMyDateFormat(roomRequest.checkOut);
                 const t=await bookingSchema.create({user: roomRequest.user, room:myRooms, checkIn: roomRequest.checkIn, checkOut: roomRequest.checkOut, roomType: roomRequest.roomType, guests:roomRequest.guests, totalPrice: totalPrice});//noOfNights: roomRequest.noOfNights,
+                
                 if(getMyDateFormat(t.checkIn)==getMyDateFormat()){
                     await bookedSchema.create({user: roomRequest.user, booking: t._id});
                     for(a=0;a<myRooms.length;a++){  

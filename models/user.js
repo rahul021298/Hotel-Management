@@ -72,7 +72,20 @@ const UserSchema = new Schema({
         default:true
     }
 });
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
 
+    this.password = await bcrypt.hash(this.password, 12);
+    this.confirmPassword = undefined;
+    next();
+})
+//Following fucntion is a instance method available on each document
+UserSchema.methods.correctPassword = async function (
+    candidatePassword,
+    userPassword
+) {
+    return await bcrypt.compare(candidatePassword, userPassword);
+};
 const User = mongoose.model('user', UserSchema);
 module.exports = User;
 

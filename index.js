@@ -8,6 +8,7 @@ const bookingFilter = require('./controllers/bookingFilter');
 const supplierRoutes = require('./routes/supplierRouter');
 const productRoutes = require('./routes/productRouter');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 // var TMClient = require('textmagic-rest-client');
 // const fast2sms = require('fast2sms');
 
@@ -33,7 +34,15 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+// app.get('/', function(req, res, next){
+//     res.cookie('book', 'trying cookie',{
+//         maxAge: 1000 * 60 * 15, // would expire after 15 minutes
+//         httpOnly: true, // The cookie only accessible by the web server
+//     });
+//     next();
+// })
 app.use(bodyParser.json());
+app.use(cookieParser("secret"));
 app.use("/users", userRoutes);
 app.use('/staff', staffRoutes);
 app.use('/room', roomRoutes);
@@ -71,9 +80,6 @@ app.listen(3000, function(){
 //     console.log('Email sent: ' + info.response);
 //   }
 // });
-
-
-
 setInterval(function(){
     bookingFilter.updateAllRooms();
 }, 500000000);
