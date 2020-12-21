@@ -5,13 +5,28 @@ const bookingSchema = require('./../models/booking');
 const availableRoomSchema = require('./../models/availableRoom');
 const bookedSchema = require('./../models/booked');
 const roomSchema = require('./../models/room'); 
+const userSchema = require('./../models/user');
+const emailService = require('./emailSetup');
+const authController = require('./authController');
+const { findOne } = require('./../models/availableRoom');
+
 router.post('/makingBookingFilter', async function(req, res, next){
     req.body.roomType={"noOfDeluxe":0, "noOfStandard":0};
     req.body.guests={"noOfAdults":0, "noOfChild":0}
-    req.body.user="5fc5fe30a173fd1350bb7dc2";
+    // console.log(req.body);
+    // console.log(req.body.user);
+    var user;
+    if(req.body.token!=null){
+        user = await userSchema.findOne({loggedInToken:req.body.token});
+        req.body.user=user._id;
+    }else{
+        return res.json({message:"not lagged in"})
+    }
+    console.log("in booking filter");
     var roomRequest = req.body;
+    console.log(roomRequest);
     var guestsCheck=false; 
-    var myRoom; var myRooms=[]; var availableRoomsByType=[];console.log(req.body);
+    var myRoom; var myRooms=[]; var availableRoomsByType=[];
     // roomRequest.roomType.noOfDeluxe = 0; 
     // roomRequest.roomType.noOfStandard=0;
     if(roomRequest.noOfDeluxe>=1){
@@ -35,7 +50,8 @@ router.post('/makingBookingFilter', async function(req, res, next){
         roomRequest.guests.noOfAdults=4;
         roomRequest.guests.noOfChild=0;
     }    
-    if(availableRoomSchema.findOne()!=null){
+    console.log(roomRequest);
+    if(await availableRoomSchema.findOne()!=null){
         if(roomRequest.roomType.noOfDeluxe>=1)
             if((roomRequest.guests.noOfChild+roomRequest.guests.noOfAdults)<=(4*roomRequest.roomType.noOfDeluxe))
                 guestsCheck=true;
@@ -43,7 +59,7 @@ router.post('/makingBookingFilter', async function(req, res, next){
             if(roomRequest.guests.noOfChild<= roomRequest.roomType.noOfStandard && roomRequest.guests.noOfAdults<=2 * roomRequest.roomType.noOfStandard)
                 guestsCheck=true;
         if(getMyDateFormat(roomRequest.checkIn)<getMyDateFormat(roomRequest.checkOut) && getMyDateFormat(roomRequest.checkIn)>=getMyDateFormat() && getMyDateFormat(roomRequest.checkOut)>getMyDateFormat() && getMyDateFormat(roomRequest.checkOut)!=getMyDateFormat(roomRequest.checkIn)){//remove checkout>getDate to reduce complexity
-            if(getMyDateFormat(roomRequest.checkIn)==getMyDateFormat()){
+            // if(getMyDateFormat(roomRequest.checkIn)==getMyDateFormat()){
                 if(roomRequest.roomType.noOfStandard>=1){
                     availableRoomsByType= await roomController.getAvailableRoomsByType("Standard");
                     if(availableRoomsByType.length>0){
@@ -68,7 +84,7 @@ router.post('/makingBookingFilter', async function(req, res, next){
                     console.log("No Deluxe Rooms checked");
                 }
                 }
-                console.log("All Rooms:")
+                console.log("All Rooms:");
                 console.log(myRooms);
                 // Booking confirmation:
                 var tempCost; stdPrice=0, delPrice=0;
@@ -94,24 +110,38 @@ router.post('/makingBookingFilter', async function(req, res, next){
                 roomRequest.checkIn=getMyDateFormat(roomRequest.checkIn);
                 roomRequest.checkOut=getMyDateFormat(roomRequest.checkOut);
                 const t=await bookingSchema.create({user: roomRequest.user, room:myRooms, checkIn: roomRequest.checkIn, checkOut: roomRequest.checkOut, roomType: roomRequest.roomType, guests:roomRequest.guests, totalPrice: totalPrice});//noOfNights: roomRequest.noOfNights,
-                
                 if(getMyDateFormat(t.checkIn)==getMyDateFormat()){
+                    console.log('today');
                     await bookedSchema.create({user: roomRequest.user, booking: t._id});
                     for(a=0;a<myRooms.length;a++){  
                         await availableRoomSchema.findOneAndDelete({room: myRooms[a]._id});
                     }
-                    console.log("Booked for ". getMyDateFormat(t.checkIn));
                     res.json({
-                        message:"success", 
+                        message:"today success", 
                         bookingReference: t
                     })
+                    const mailData={
+                        from: 'rahotels0212@gmail.com',
+                        to: user.email,
+                        subject: 'We look forward to meet you soon!',
+                        text: `check In now with: ${t._id}`
+                        };
+                    emailService.sendEmail(mailData);
                 }else{
-                    res.json({
+                    console.log('future');
+                    res.status(200).json({
                         message:"future Bookin..", 
                         bookingReference: t
                     })
+                    const mailData={
+                        from: 'rahotels0212@gmail.com',
+                        to: 'mvazirani01@gmail.com',
+                        subject: 'We look forward to meet you soon!',
+                        text: `${t}`
+                        };
+                    emailService.sendEmail(mailData);
                 }
-            }
+            // }
         }else{
             console.log("Date Error!");
         }
@@ -137,7 +167,12 @@ function getMyDateFormat(date){
     {
         mm='0'+mm;
     }
-    today = dd+'-'+mm+'-'+yyyy;
+    // if(date==null){
+    //     today = mm+'-'+dd+'-'+yyyy;
+    // }else{
+    //     today = dd+'-'+mm+'-'+yyyy;
+    // }
+   today = mm+'-'+dd+'-'+yyyy;
     return(today); 
 }
 function calculateNumberOfNights(date1, date2) {
@@ -148,7 +183,7 @@ module.exports.updateAllRooms = async function(){
     
     for(var i=0;i<bookedRooms.length;i++){
         const bookingReference = await bookingSchema.findById(bookedRooms[i].booking);
-        if(getMyDateFormat(bookingReference.checkOut)==getMyDateFormat()){ //getDate(bookingReference.checkOut)
+        if(getMyDateFormat()==getMyDateFormat()){ //getMyDateFormat(bookingReference.checkOut)
            for(var j=0;j<bookingReference.room.length;j++){
               await availableRoomSchema.create({room: bookingReference.room[j]});
            }

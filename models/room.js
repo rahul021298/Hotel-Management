@@ -35,8 +35,6 @@ RoomSchema.post('save', async function(doc, next){
 const Room = mongoose.model('room', RoomSchema);
 module.exports = Room;
 
-
-
 // {
 // "roomNo":001,
 // "roomType":"Deluxe",

@@ -1,8 +1,10 @@
 const Room = require('../models/room');
 const Booked =require('../models/booked');
 const availableRoomSchema = require('./../models/availableRoom');
+const bookingSchema = require('../models/booking');
 module.exports.getRooms = async function(){
     const rooms = await Room.find();
+    console.log("in controller");
     return rooms;
 }
 
@@ -14,6 +16,12 @@ module.exports.updateRooms = async function(id, data){
     const updatedRoom = await Room.findByIdAndUpdate(id, data);
     return updatedRoom;
 }
+
+module.exports.deleteRooms = async function(id){
+    const deletedRoom = await Room.findByIdAndRemove(id);
+    return deletedRoom;
+}
+
 module.exports.getAvailableRoomsByType = async function(roomRequestType){
     const availableRooms = await availableRoomSchema.find();
     var availableRoomsByType=[]; var temp;
@@ -24,32 +32,27 @@ module.exports.getAvailableRoomsByType = async function(roomRequestType){
     }
     return(availableRoomsByType);
 }
-
-module.exports.deleteRooms = async function(id){
-    const deletedRoom = await Room.findByIdAndRemove(id);
-    return deletedRoom;
-}
-module.exports.getRoomById = async function(id){
-    const room = await Room.findById(id);
-    return room;
-}
-
 module.exports.getBookedRooms = async function(){
-    const bookedRooms = await Room.find({"isBooked":true});
-    return bookedRooms;  
+    const bookeds = await Booked.find().populate('room');
+    // let arr = [];
+    // for(var i=0;i<bookeds.length;i++){
+    //     arr.push(await bookingSchema.findById(bookeds[i]._id));
+    // }
+    // let bookedRooms;
+    // for(var i=0;i<arr.length;i++){
+    //     for(var j=0;j<arr[i].room.length;j++)
+    //         bookedRooms.push(await Room.findById(arr[i].room[j]));
+    // }
+    return bookeds;  
 }
 
 module.exports.getAvailableRooms = async function(){
-    const availableRooms = await Room.find({"isBooked":false});
+    const availableRooms = await availableRoomSchema.find().populate('room');
+    // let arr = [];
+    // for(var i=0;i<availableRooms.length;i++){
+    //     arr.push(await Room.findById(availableRooms[i]._id));
+    // }
+    // console.log(arr);
+    // console.log(availableRooms);
     return availableRooms;  
 }
-
-module.exports.getRoomsByType = async function(type){
-    const allRoomsBytype = await Room.find({"roomType":type});
-    return allRoomsBytype;
-}
-
-// module.exports.getAvailableRoomsByDate = async function(date1, date2){
-//     const availableRooms = await Room.find({  });
-//     return availableRooms;  
-// }

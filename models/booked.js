@@ -9,11 +9,11 @@ const BookedSchema = new Schema({
         required: true
     },
     //room info retrived from Room Type and roomNo would be allocated by the system..
-    // room:[{
-    //     type: mongoose.Schema.ObjectId,
-    //     ref: 'room',
-    //     required: true
-    // }],
+    room:[{
+        type: mongoose.Schema.ObjectId,
+        ref: 'room',
+        required: true
+    }],
     booking:{
         type: mongoose.Schema.ObjectId,
         ref: 'booked',

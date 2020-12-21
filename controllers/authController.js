@@ -57,14 +57,12 @@ exports.signup = (async (request, response, next) => {
 
     const newUser = await User.create(request.body);
     console.log("user inserted");
-    // http://127.0.0.1:3000/me
-    // const url = `${request.protocol}://${request.get('host')}/login`;
-    // await new Email(newUser, url).sendWelcome();
-    console.log('EMAIL SENT')
-    createSendToken(newUser, 201, response);
+    const token = signToken(newUser._id);
+    response.json({message:"logged in", session: token})
 });
 
 exports.login = (async (req, res, next) => {
+    // console.log("In auth");
     // let options = {
     //     maxAge: 1000 * 60 * 15, // would expire after 15 minutes
     //     httpOnly: true, // The cookie only accessible by the web server
@@ -85,11 +83,17 @@ exports.login = (async (req, res, next) => {
     const user = await User.findOne({
         userName: username
     }).select('+password');
-    if (!user || !(password==user.password)){//!(await user.correctPassword(password, user.password))) {
-        return next(('Incorrect email or password'));
+    console.log(user);
+    if (!user || !(await user.correctPassword(password, user.password))) {
+        return res.json({message:"invalid", session:""});
     }
-    const token = signToken(user._id);
-    res.json({message:"logged in", session: token})
+    req.body.user = user;
+    const session = signToken(user._id);
+    user.loggedInToken = session;
+    await user.save({
+        validateBeforeSave: false
+    });
+    res.json({message:"logged in", session})
     // createSendToken(user, 200, response);
 });
 
@@ -193,7 +197,8 @@ exports.forgotPassword = (async (req, res, next) => {
     });
 
     try {
-        const resetURL = `${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`;
+        var host = "localhost:4200";
+        const resetURL = `${req.protocol}://${host}/resetPassword/${resetToken}`;
         await email.sendEmail({
             email: user.email,
             subject: 'Request to reset password(valid for 10 minutes)',
